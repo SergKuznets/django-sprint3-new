@@ -2,12 +2,15 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from .models import Post, Category
+from .constants import COUNT_POST_MAIN
 
-LAST_POST = 5
 
-
-def get_published_posts():
-    return Post.objects.filter(
+def filter_posts(queryset):
+    return queryset.select_related(
+        'author',
+        'location',
+        'category'
+    ).filter(
         pub_date__lte=timezone.now(),
         is_published=True,
         category__is_published=True
@@ -15,23 +18,16 @@ def get_published_posts():
 
 
 def index(request):
-    template_name = 'blog/index.html'
-    posts = get_published_posts()[:LAST_POST]
-    context = {
-        'posts': posts
-    }
-    return render(request, template_name, context)
+    posts = filter_posts(Post.objects.all())[:COUNT_POST_MAIN]
+    return render(request, 'blog/index.html', {'posts': posts})
 
 
 def post_detail(request, pk):
     post = get_object_or_404(
-        get_published_posts(),
+        filter_posts(Post.objects.all()),
         pk=pk,
     )
-    context = {
-        'post': post
-    }
-    return render(request, 'blog/detail.html', context)
+    return render(request, 'blog/detail.html', {'post': post})
 
 
 def category_posts(request, category_slug):
@@ -40,9 +36,11 @@ def category_posts(request, category_slug):
         slug=category_slug,
         is_published=True
     )
-    posts = get_published_posts().filter(category=category)
-    context = {
-        'category': category,
-        'posts': posts
-    }
-    return render(request, 'blog/category.html', context)
+    posts = filter_posts(category.posts.all())
+    return render(
+        request, 'blog/category.html',
+        {
+            'category': category,
+            'posts': posts
+        }
+    )
