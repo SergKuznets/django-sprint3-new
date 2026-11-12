@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .constants import CHAR_MAX_LENGTH
+from .constants import CHAR_FIELD_MAX_LENGTH
 
 User = get_user_model()
 
 
-class PublishedModel(models.Model):
+class PublishedCreatedAtAbstract(models.Model):
     is_published = models.BooleanField(
         default=True, verbose_name='Опубликовано',
         help_text='Снимите галочку, чтобы скрыть публикацию.'
@@ -19,9 +19,9 @@ class PublishedModel(models.Model):
         abstract = True
 
 
-class Category(PublishedModel):
+class Category(PublishedCreatedAtAbstract):
     title = models.CharField(
-        max_length=CHAR_MAX_LENGTH,
+        max_length=CHAR_FIELD_MAX_LENGTH,
         verbose_name='Заголовок'
     )
     description = models.TextField(verbose_name='Описание')
@@ -31,31 +31,31 @@ class Category(PublishedModel):
         'латиницы, цифры, дефис и подчёркивание.'
     )
 
-    class Meta(PublishedModel.Meta):
+    class Meta(PublishedCreatedAtAbstract.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title
+        return self.title[:20]
 
 
-class Location(PublishedModel):
+class Location(PublishedCreatedAtAbstract):
     name = models.CharField(
-        max_length=CHAR_MAX_LENGTH,
+        max_length=CHAR_FIELD_MAX_LENGTH,
         verbose_name='Название места'
     )
 
-    class Meta(PublishedModel.Meta):
+    class Meta(PublishedCreatedAtAbstract.Meta):
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[:20]
 
 
-class Post(PublishedModel):
+class Post(PublishedCreatedAtAbstract):
     title = models.CharField(
-        max_length=CHAR_MAX_LENGTH,
+        max_length=CHAR_FIELD_MAX_LENGTH,
         verbose_name='Заголовок'
     )
     text = models.TextField(verbose_name='Текст')
@@ -91,4 +91,4 @@ class Post(PublishedModel):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.title
+        return self.title[:20]
