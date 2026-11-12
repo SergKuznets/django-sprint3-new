@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .constants import CHAR_FIELD_MAX_LENGTH
+from .constants import CHAR_FIELD_MAX_LENGTH, MAX_LENGTH_STR
 
 User = get_user_model()
 
 
-class PublishedCreatedAtAbstract(models.Model):
+class IsPublishedCreatedAtAbstract(models.Model):
     is_published = models.BooleanField(
         default=True, verbose_name='Опубликовано',
         help_text='Снимите галочку, чтобы скрыть публикацию.'
@@ -19,7 +19,7 @@ class PublishedCreatedAtAbstract(models.Model):
         abstract = True
 
 
-class Category(PublishedCreatedAtAbstract):
+class Category(IsPublishedCreatedAtAbstract):
     title = models.CharField(
         max_length=CHAR_FIELD_MAX_LENGTH,
         verbose_name='Заголовок'
@@ -31,29 +31,29 @@ class Category(PublishedCreatedAtAbstract):
         'латиницы, цифры, дефис и подчёркивание.'
     )
 
-    class Meta(PublishedCreatedAtAbstract.Meta):
+    class Meta(IsPublishedCreatedAtAbstract.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title[:20]
+        return self.title[:MAX_LENGTH_STR]
 
 
-class Location(PublishedCreatedAtAbstract):
+class Location(IsPublishedCreatedAtAbstract):
     name = models.CharField(
         max_length=CHAR_FIELD_MAX_LENGTH,
         verbose_name='Название места'
     )
 
-    class Meta(PublishedCreatedAtAbstract.Meta):
+    class Meta(IsPublishedCreatedAtAbstract.Meta):
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name[:20]
+        return self.name[:MAX_LENGTH_STR]
 
 
-class Post(PublishedCreatedAtAbstract):
+class Post(IsPublishedCreatedAtAbstract):
     title = models.CharField(
         max_length=CHAR_FIELD_MAX_LENGTH,
         verbose_name='Заголовок'
@@ -91,4 +91,4 @@ class Post(PublishedCreatedAtAbstract):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.title[:20]
+        return self.title[:MAX_LENGTH_STR]
