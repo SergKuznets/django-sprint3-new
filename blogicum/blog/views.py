@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from django.utils import now
+from django.utils.timezone import now
 
 from .models import Post, Category
 from .constants import COUNT_POST_MAIN
